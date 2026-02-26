@@ -1,6 +1,8 @@
 using System;
 using System.Windows.Forms;
-
+//Realizado por CHATGPT-4, basado en el ejercicio de adivinar
+//un número. El código se ha estructurado para que el juego tenga el protagonismo,
+//emitiendo eventos con su estado, y la UI solo se encarga de mostrarlo y enviar los intentos del usuario.
 namespace GuessTheNumber
 {
     public partial class MainForm : Form
