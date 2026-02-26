@@ -10,7 +10,24 @@ namespace GuessTheNumber
         public MainForm()
         {
             InitializeComponent();
-            ApplyNewGameState();
+
+            // La UI escucha al juego
+            _game.StateChanged += Game_StateChanged;
+
+            // Primer estado
+            lblRange.Text = $"Rango: {_game.Min} – {_game.Max}";
+        }
+
+        private void Game_StateChanged(object? sender, GameStateChangedEventArgs e)
+        {
+            lblHint.Text = e.Message;
+            lblAttempts.Text = $"Intentos: {e.Attempts}";
+
+            txtGuess.Enabled = !e.IsFinished;
+            btnTry.Enabled = !e.IsFinished;
+
+            txtGuess.SelectAll();
+            txtGuess.Focus();
         }
 
         private void btnTry_Click(object sender, EventArgs e)
@@ -23,52 +40,14 @@ namespace GuessTheNumber
                 return;
             }
 
-            if (value < _game.Min || value > _game.Max)
-            {
-                lblHint.Text = $"El número debe estar entre {_game.Min} y {_game.Max}.";
-                txtGuess.SelectAll();
-                txtGuess.Focus();
-                return;
-            }
-
-            var result = _game.TryGuess(value);
-
-            lblAttempts.Text = $"Intentos: {_game.Attempts}";
-
-            lblHint.Text = result switch
-            {
-                GuessResult.TooLow => "Más alto.",
-                GuessResult.TooHigh => "Más bajo.",
-                GuessResult.Correct => "¡Correcto! 🎉 Pulsa “Nuevo juego” para repetir.",
-                GuessResult.AlreadyFinished => "La partida ya terminó. Pulsa “Nuevo juego”.",
-                _ => "—"
-            };
-
-            if (result == GuessResult.Correct)
-            {
-                txtGuess.Enabled = false;
-                btnTry.Enabled = false;
-            }
-
-            txtGuess.SelectAll();
-            txtGuess.Focus();
+            // La UI NO decide el resultado, solo envía el intento
+            _game.TryGuess(value);
         }
 
         private void btnNew_Click(object sender, EventArgs e)
         {
             _game.Reset();
-            ApplyNewGameState();
-        }
-
-        private void ApplyNewGameState()
-        {
-            lblRange.Text = $"Rango: {_game.Min} – {_game.Max}";
-            lblAttempts.Text = "Intentos: 0";
-            lblHint.Text = "Escribe un número y pulsa “Probar”.";
-            txtGuess.Enabled = true;
-            btnTry.Enabled = true;
             txtGuess.Text = "";
-            txtGuess.Focus();
         }
     }
 }
